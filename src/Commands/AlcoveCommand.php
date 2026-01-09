@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Alcove\Alcove\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class AlcoveCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'alcove';
 
     public $description = 'My command';
 
