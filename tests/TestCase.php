@@ -2,9 +2,9 @@
 
 namespace Alcove\Alcove\Tests;
 
+use Alcove\Alcove\AlcoveServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Alcove\Alcove\AlcoveServiceProvider;
 
 class TestCase extends Orchestra
 {

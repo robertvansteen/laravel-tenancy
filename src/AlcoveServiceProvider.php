@@ -2,9 +2,9 @@
 
 namespace Alcove\Alcove;
 
+use Alcove\Alcove\Commands\AlcoveCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Alcove\Alcove\Commands\AlcoveCommand;
 
 class AlcoveServiceProvider extends PackageServiceProvider
 {
