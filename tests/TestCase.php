@@ -1,37 +1,46 @@
 <?php
 
-namespace Alcove\Alcove\Tests;
+declare(strict_types=1);
 
-use Alcove\Alcove\AlcoveServiceProvider;
+namespace Alcove\Tests;
+
+use Alcove\AlcoveServiceProvider;
+use Alcove\Testing\TenantTestHelpers;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    use TenantTestHelpers;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Alcove\\Alcove\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Alcove\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
-    protected function getPackageProviders($app)
+    /**
+     * @return array<int, class-string>
+     */
+    protected function getPackageProviders($app): array
     {
         return [
             AlcoveServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    /**
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/../database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        // Run migrations
+        $migration = include __DIR__.'/../database/migrations/create_tenants_table.php.stub';
+        $migration->up();
     }
 }
