@@ -35,13 +35,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Alcove\\Alcove\\": "src/",
-            "Alcove\\Alcove\\Database\\Factories\\": "database/factories/"
+            "Alcove\\": "src/",
+            "Alcove\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Alcove\\Alcove\\Tests\\": "tests/",
+            "Alcove\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +63,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Alcove\\Alcove\\AlcoveServiceProvider"
+                "Alcove\\AlcoveServiceProvider"
             ],
             "aliases": {
-                "Alcove": "Alcove\\Alcove\\Facades\\Alcove"
+                "Alcove": "Alcove\\Facades\\Alcove"
             }
         }
     },

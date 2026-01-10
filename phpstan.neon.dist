@@ -10,3 +10,8 @@ parameters:
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+    ignoreErrors:
+        # Package config files use env() which is correct for packages
+        - identifier: larastan.noEnvCallsOutsideOfConfig
+        # Traits are meant to be used by package consumers
+        - identifier: trait.unused

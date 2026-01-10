@@ -1,16 +1,33 @@
 <?php
 
-namespace Alcove\Alcove\Facades;
+declare(strict_types=1);
 
+namespace Alcove\Facades;
+
+use Alcove\Alcove as AlcoveService;
+use Alcove\Contracts\Tenant;
+use Closure;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Alcove\Alcove\Alcove
+ * @method static static addResolver(\Alcove\Contracts\TenantResolver $resolver)
+ * @method static Tenant|null initialize(\Illuminate\Http\Request $request)
+ * @method static static setTenant(Tenant $tenant)
+ * @method static static forgetTenant()
+ * @method static Tenant|null tenant()
+ * @method static Tenant tenantOrFail()
+ * @method static bool hasTenant()
+ * @method static mixed run(Tenant $tenant, Closure $callback)
+ * @method static mixed runWithoutTenant(Closure $callback)
+ * @method static static forget()
+ * @method static bool isInitialized()
+ *
+ * @see \Alcove\Alcove
  */
 class Alcove extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return \Alcove\Alcove\Alcove::class;
+        return AlcoveService::class;
     }
 }
