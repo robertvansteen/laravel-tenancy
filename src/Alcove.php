@@ -156,7 +156,6 @@ class Alcove
         }
     }
 
-
     /**
      * Clear tenant context.
      *
