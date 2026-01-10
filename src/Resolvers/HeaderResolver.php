@@ -15,15 +15,14 @@ class HeaderResolver implements TenantResolver
      * @param  class-string<Model&Tenant>  $tenantModel
      */
     public function __construct(
-        protected Request $request,
         protected string $tenantModel,
         protected string $header = 'X-Tenant-ID',
         protected string $identifierColumn = 'id',
     ) {}
 
-    public function resolve(): ?Tenant
+    public function resolve(Request $request): ?Tenant
     {
-        $identifier = $this->request->header($this->header);
+        $identifier = $request->header($this->header);
 
         if ($identifier === null || $identifier === '') {
             return null;
@@ -37,8 +36,8 @@ class HeaderResolver implements TenantResolver
         return $tenant;
     }
 
-    public function canResolve(): bool
+    public function canResolve(Request $request): bool
     {
-        return $this->request->hasHeader($this->header);
+        return $request->hasHeader($this->header);
     }
 }

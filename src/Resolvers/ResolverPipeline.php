@@ -33,10 +33,10 @@ class ResolverPipeline implements TenantResolver
     /**
      * Resolve a tenant by trying each resolver in order.
      */
-    public function resolve(): ?Tenant
+    public function resolve(\Illuminate\Http\Request $request): ?Tenant
     {
         foreach ($this->resolvers as $resolver) {
-            if ($resolver->canResolve() && $tenant = $resolver->resolve()) {
+            if ($resolver->canResolve($request) && $tenant = $resolver->resolve($request)) {
                 return $tenant;
             }
         }
@@ -47,10 +47,10 @@ class ResolverPipeline implements TenantResolver
     /**
      * Check if any resolver can attempt resolution.
      */
-    public function canResolve(): bool
+    public function canResolve(\Illuminate\Http\Request $request): bool
     {
         foreach ($this->resolvers as $resolver) {
-            if ($resolver->canResolve()) {
+            if ($resolver->canResolve($request)) {
                 return true;
             }
         }

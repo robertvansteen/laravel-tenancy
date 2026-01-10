@@ -11,23 +11,23 @@ use Closure;
 class CallbackResolver implements TenantResolver
 {
     /**
-     * @param  Closure(): (Tenant|null)  $resolver
-     * @param  (Closure(): bool)|null  $canResolveCallback
+     * @param  Closure(\Illuminate\Http\Request): (Tenant|null)  $resolver
+     * @param  (Closure(\Illuminate\Http\Request): bool)|null  $canResolveCallback
      */
     public function __construct(
         protected Closure $resolver,
         protected ?Closure $canResolveCallback = null,
     ) {}
 
-    public function resolve(): ?Tenant
+    public function resolve(\Illuminate\Http\Request $request): ?Tenant
     {
-        return ($this->resolver)();
+        return ($this->resolver)($request);
     }
 
-    public function canResolve(): bool
+    public function canResolve(\Illuminate\Http\Request $request): bool
     {
         if ($this->canResolveCallback !== null) {
-            return ($this->canResolveCallback)();
+            return ($this->canResolveCallback)($request);
         }
 
         return true;

@@ -19,7 +19,7 @@ class InitializeTenancy
      */
     public function handle(Request $request, Closure $next, bool $required = true): Response
     {
-        $tenant = Alcove::initialize();
+        $tenant = Alcove::initialize($request);
 
         if ($required && $tenant === null) {
             throw new TenantNotFoundException(
@@ -35,6 +35,6 @@ class InitializeTenancy
      */
     public function terminate(Request $request, Response $response): void
     {
-        Alcove::forget();
+        Alcove::forgetTenant();
     }
 }

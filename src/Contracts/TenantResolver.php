@@ -7,12 +7,12 @@ namespace Alcove\Contracts;
 interface TenantResolver
 {
     /**
-     * Attempt to resolve a tenant from the current context.
+     * Attempt to resolve a tenant from the given request.
      */
-    public function resolve(): ?Tenant;
+    public function resolve(\Illuminate\Http\Request $request): ?Tenant;
 
     /**
-     * Check if this resolver can attempt resolution.
+     * Check if this resolver can attempt resolution for the given request.
      */
-    public function canResolve(): bool;
+    public function canResolve(\Illuminate\Http\Request $request): bool;
 }

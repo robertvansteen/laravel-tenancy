@@ -18,28 +18,36 @@ class Alcove
 
     protected bool $initialized = false;
 
-    /** @var array<int, Closure> */
-    protected array $onTenantCallbacks = [];
-
     public function __construct(
         protected TenantResolver $resolver,
         protected TenantDatabaseManager $databaseManager,
     ) {}
 
     /**
-     * Initialize tenancy from the current request context.
+     * Add a resolver to the pipeline.
      */
-    public function initialize(): ?Tenant
+    public function addResolver(TenantResolver $resolver): static
+    {
+        if ($this->resolver instanceof Resolvers\ResolverPipeline) {
+            $this->resolver->pipe($resolver);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Initialize tenancy from the given request context.
+     */
+    public function initialize(\Illuminate\Http\Request $request): ?Tenant
     {
         if ($this->initialized) {
             return $this->tenant;
         }
 
-        $this->tenant = $this->resolver->resolve();
+        $this->tenant = $this->resolver->resolve($request);
         $this->initialized = true;
 
         if ($this->tenant) {
-            $this->bootstrap($this->tenant);
             event(new TenantIdentified($this->tenant));
         }
 
@@ -49,20 +57,28 @@ class Alcove
     /**
      * Set the current tenant explicitly.
      */
-    public function setTenant(?Tenant $tenant): static
+    public function setTenant(Tenant $tenant): static
     {
         $previousTenant = $this->tenant;
         $this->tenant = $tenant;
         $this->initialized = true;
 
-        if ($tenant) {
-            $this->bootstrap($tenant);
-        } else {
-            $this->databaseManager->switchToCentral();
-        }
+        event(new TenantChanged($tenant, $previousTenant));
 
-        if ($previousTenant !== $tenant) {
-            event(new TenantChanged($tenant, $previousTenant));
+        return $this;
+    }
+
+    /**
+     * Forget the current tenant.
+     */
+    public function forgetTenant(): static
+    {
+        $previousTenant = $this->tenant;
+        $this->tenant = null;
+        $this->initialized = false;
+
+        if ($previousTenant !== null) {
+            event(new TenantChanged(null, $previousTenant));
         }
 
         return $this;
@@ -130,46 +146,25 @@ class Alcove
         $previousTenant = $this->tenant;
 
         try {
-            $this->setTenant(null);
+            $this->forgetTenant();
 
             return $callback();
         } finally {
-            $this->setTenant($previousTenant);
+            if ($previousTenant !== null) {
+                $this->setTenant($previousTenant);
+            }
         }
     }
 
-    /**
-     * Bootstrap tenant-specific services.
-     */
-    protected function bootstrap(Tenant $tenant): void
-    {
-        $this->databaseManager->switchToTenant($tenant);
-
-        foreach ($this->onTenantCallbacks as $callback) {
-            $callback($tenant);
-        }
-    }
-
-    /**
-     * Register a callback to run when tenant is set.
-     */
-    public function onTenant(Closure $callback): static
-    {
-        $this->onTenantCallbacks[] = $callback;
-
-        return $this;
-    }
 
     /**
      * Clear tenant context.
+     *
+     * @deprecated Use forgetTenant() instead
      */
     public function forget(): static
     {
-        $this->tenant = null;
-        $this->initialized = false;
-        $this->databaseManager->switchToCentral();
-
-        return $this;
+        return $this->forgetTenant();
     }
 
     /**

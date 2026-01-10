@@ -16,36 +16,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Tenant Resolvers
-    |--------------------------------------------------------------------------
-    |
-    | Configure how tenants are identified. Resolvers are tried in order
-    | until one successfully identifies a tenant. The header resolver is
-    | great for local development and APIs.
-    |
-    | Available drivers: header, subdomain, path, callback
-    |
-    */
-
-    'resolvers' => [
-        [
-            'driver' => 'header',
-            'header' => 'X-Tenant-ID',
-            'column' => 'id',
-        ],
-        // [
-        //     'driver' => 'subdomain',
-        //     'domain' => env('APP_DOMAIN', 'localhost'),
-        //     'column' => 'slug',
-        // ],
-        // [
-        //     'driver' => 'path',
-        //     'column' => 'slug',
-        // ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Database Strategy
     |--------------------------------------------------------------------------
     |

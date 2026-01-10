@@ -18,15 +18,14 @@ class SubdomainResolver implements TenantResolver
      * @param  class-string<Model&Tenant>  $tenantModel
      */
     public function __construct(
-        protected Request $request,
         protected string $tenantModel,
         protected string $baseDomain,
         protected string $identifierColumn = 'slug',
     ) {}
 
-    public function resolve(): ?Tenant
+    public function resolve(Request $request): ?Tenant
     {
-        $subdomain = $this->extractSubdomain();
+        $subdomain = $this->extractSubdomain($request);
 
         if ($subdomain === null || in_array($subdomain, $this->excludedSubdomains, true)) {
             return null;
@@ -40,9 +39,9 @@ class SubdomainResolver implements TenantResolver
         return $tenant;
     }
 
-    public function canResolve(): bool
+    public function canResolve(Request $request): bool
     {
-        return $this->extractSubdomain() !== null;
+        return $this->extractSubdomain($request) !== null;
     }
 
     /**
@@ -57,9 +56,9 @@ class SubdomainResolver implements TenantResolver
         return $this;
     }
 
-    protected function extractSubdomain(): ?string
+    protected function extractSubdomain(Request $request): ?string
     {
-        $host = $this->request->getHost();
+        $host = $request->getHost();
         $baseDomain = ltrim($this->baseDomain, '.');
 
         if (! str_ends_with($host, $baseDomain)) {

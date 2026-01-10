@@ -10,14 +10,15 @@ use Closure;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static Tenant|null initialize()
- * @method static static setTenant(Tenant|null $tenant)
+ * @method static static addResolver(\Alcove\Contracts\TenantResolver $resolver)
+ * @method static Tenant|null initialize(\Illuminate\Http\Request $request)
+ * @method static static setTenant(Tenant $tenant)
+ * @method static static forgetTenant()
  * @method static Tenant|null tenant()
  * @method static Tenant tenantOrFail()
  * @method static bool hasTenant()
  * @method static mixed run(Tenant $tenant, Closure $callback)
  * @method static mixed runWithoutTenant(Closure $callback)
- * @method static static onTenant(Closure $callback)
  * @method static static forget()
  * @method static bool isInitialized()
  *

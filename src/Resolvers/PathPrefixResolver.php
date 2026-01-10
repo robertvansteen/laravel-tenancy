@@ -15,14 +15,13 @@ class PathPrefixResolver implements TenantResolver
      * @param  class-string<Model&Tenant>  $tenantModel
      */
     public function __construct(
-        protected Request $request,
         protected string $tenantModel,
         protected string $identifierColumn = 'slug',
     ) {}
 
-    public function resolve(): ?Tenant
+    public function resolve(Request $request): ?Tenant
     {
-        $prefix = $this->extractPrefix();
+        $prefix = $this->extractPrefix($request);
 
         if ($prefix === null) {
             return null;
@@ -36,22 +35,22 @@ class PathPrefixResolver implements TenantResolver
         return $tenant;
     }
 
-    public function canResolve(): bool
+    public function canResolve(Request $request): bool
     {
-        return $this->extractPrefix() !== null;
+        return $this->extractPrefix($request) !== null;
     }
 
     /**
      * Get the tenant identifier from the URL path.
      */
-    public function getPrefix(): ?string
+    public function getPrefix(Request $request): ?string
     {
-        return $this->extractPrefix();
+        return $this->extractPrefix($request);
     }
 
-    protected function extractPrefix(): ?string
+    protected function extractPrefix(Request $request): ?string
     {
-        $segments = $this->request->segments();
+        $segments = $request->segments();
 
         return $segments[0] ?? null;
     }

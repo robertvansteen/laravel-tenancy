@@ -45,7 +45,7 @@ class AlcoveServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        $this->registerMiddleware();
+        $this->registerEventListeners();
     }
 
     protected function registerDatabaseStrategy(): void
@@ -79,61 +79,8 @@ class AlcoveServiceProvider extends PackageServiceProvider
     protected function registerResolverPipeline(): void
     {
         $this->app->singleton(TenantResolver::class, function (Application $app): TenantResolver {
-            $pipeline = new ResolverPipeline;
-
-            /** @var class-string<\Alcove\Contracts\Tenant&\Illuminate\Database\Eloquent\Model> $tenantModel */
-            $tenantModel = config('alcove.tenant_model', Models\Tenant::class);
-
-            /** @var array<int, array<string, mixed>> $resolverConfigs */
-            $resolverConfigs = config('alcove.resolvers', []);
-
-            foreach ($resolverConfigs as $resolverConfig) {
-                $resolver = $this->createResolver($app, $tenantModel, $resolverConfig);
-
-                if ($resolver !== null) {
-                    $pipeline->pipe($resolver);
-                }
-            }
-
-            return $pipeline;
+            return new ResolverPipeline;
         });
-    }
-
-    /**
-     * @param  class-string<\Alcove\Contracts\Tenant&\Illuminate\Database\Eloquent\Model>  $tenantModel
-     * @param  array<string, mixed>  $config
-     */
-    protected function createResolver(Application $app, string $tenantModel, array $config): ?TenantResolver
-    {
-        /** @var string $driver */
-        $driver = $config['driver'] ?? '';
-
-        return match ($driver) {
-            'header' => new HeaderResolver(
-                $app->make('request'),
-                $tenantModel,
-                $config['header'] ?? 'X-Tenant-ID',
-                $config['column'] ?? 'id',
-            ),
-            'subdomain' => new SubdomainResolver(
-                $app->make('request'),
-                $tenantModel,
-                $config['domain'] ?? config('app.url', 'localhost'),
-                $config['column'] ?? 'slug',
-            ),
-            'path' => new PathPrefixResolver(
-                $app->make('request'),
-                $tenantModel,
-                $config['column'] ?? 'slug',
-            ),
-            'callback' => isset($config['resolver']) && is_callable($config['resolver'])
-                ? new CallbackResolver(
-                    $config['resolver'],
-                    $config['canResolve'] ?? null,
-                )
-                : null,
-            default => null,
-        };
     }
 
     protected function registerAlcove(): void
@@ -148,11 +95,11 @@ class AlcoveServiceProvider extends PackageServiceProvider
         $this->app->alias(Alcove::class, 'alcove');
     }
 
-    protected function registerMiddleware(): void
+    protected function registerEventListeners(): void
     {
-        /** @var \Illuminate\Routing\Router $router */
-        $router = $this->app->make('router');
+        /** @var \Illuminate\Events\Dispatcher $events */
+        $events = $this->app->make('events');
 
-        $router->aliasMiddleware('tenant', InitializeTenancy::class);
+        $events->subscribe(Listeners\BootstrapTenancy::class);
     }
 }
